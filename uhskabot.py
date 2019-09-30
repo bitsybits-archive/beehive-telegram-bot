@@ -37,10 +37,21 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
+def track_user(update, action):
+    if not config.ENABLE_TRACKING:
+        return
+
+    user = update.message.from_user
+    logger.info('Action %s\n\tText: %s\n\tFrom: %s %s',
+        action, update.message.text, user.first_name, user.last_name)
+
+
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
+    track_user(update, '/start')
+
     update.message.reply_text('Welcome to Beehive bot!\n\n'
         'Commands: /start /help and then try to find easter eggs!')
 
@@ -54,11 +65,14 @@ def start(update, context):
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    #update.message.reply_text('Ne lez bld debil ska banniy!')
+    track_user(update, '/help')
+
     update.message.reply_voice(audios.NE_LEZ_SKA)
 
 
 def gender(update, context):
+    track_user(update, 'GENDER')
+
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     if update.message.text == "Other":
@@ -75,6 +89,7 @@ def echo(update, context):
 
 
 def text_handler(update, context):
+    track_user(update, 'TEXT')
     if update.message.text.lower() == 'uh' \
        or update.message.text.lower() == 'uh ska' \
        or update.message.text.lower() == 'ууска':
@@ -128,10 +143,11 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, text_handler))
 
     # FOR TEST ONLY
-    dp.add_handler(MessageHandler(Filters.sticker, sticker_handler))
-    dp.add_handler(MessageHandler(Filters.animation, animation_handler))
-    dp.add_handler(MessageHandler(Filters.audio, audio_handler))
-    dp.add_handler(MessageHandler(Filters.voice, voice_handler))
+    if config.TEST_MODE:
+        dp.add_handler(MessageHandler(Filters.sticker, sticker_handler))
+        dp.add_handler(MessageHandler(Filters.animation, animation_handler))
+        dp.add_handler(MessageHandler(Filters.audio, audio_handler))
+        dp.add_handler(MessageHandler(Filters.voice, voice_handler))
 
     # log all errors
     dp.add_error_handler(error)
