@@ -7,3 +7,4 @@ TELEGRAM_SEND_MESSAGE_URL = BASE_TELEGRAM_URL + '/sendMessage?chat_id={}&text={}
 
 ENABLE_TRACKING = True
 TEST_MODE = False
+SAVE_LOGS = True

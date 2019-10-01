@@ -16,8 +16,10 @@ bot.
 import animations
 import audios
 import config
+import datetime
 import logging
 import stickers
+import sys
 
 from telegram.ext import (
     Updater,
@@ -35,6 +37,16 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+logPath = 'logs'
+# Log to stdout
+console_handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(console_handler)
+# Log to file
+if config.SAVE_LOGS:
+    log_file_name = str(datetime.datetime.now())
+    file_handler = logging.FileHandler('{0}/{1}.log'.format(logPath, log_file_name))
+    logger.addHandler(file_handler)
 
 
 def track_user(update, action):
